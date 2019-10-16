@@ -7,8 +7,6 @@ import time
 
 i2c = machine.I2C(-1, machine.Pin(5), machine.Pin(4))
 oled = ssd1306.SSD1306_I2C(128, 32, i2c)
-# API_KEY = "AIzaSyAuVBCra8qfLX5TSHYI8hb_1n5rDY2V4oA" #Jason's key
-# API_ENDPOINT = "https://www.googleapis.com/geolocation/v1/geolocate?key="
 
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
@@ -39,7 +37,7 @@ def do_connect():
 #
 # def get_weather(x,y):
 #     #sample API url & key
-#     weather_api_key = "&appid=34ff8085d3b99815d850093dda28e624"
+#     weather_api_key =
 #     weather_call ="https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}".format(x,y)
 #
 #     reply = urequests.get(url =weather_call+weather_api_key )
@@ -52,7 +50,7 @@ def do_connect():
 def send_twitter():
     tweet = {"value2" : "#ThinkHarder!", "value1": "to debug Micropython"}
 
-    twt_url = "https://maker.ifttt.com/trigger/tweet/with/key/cHsQR-Qfw8rX88SVIpLOOH"
+    twt_url =
     twitter = urequests.post(url = twt_url, json = tweet) # pure genius library
 
 
