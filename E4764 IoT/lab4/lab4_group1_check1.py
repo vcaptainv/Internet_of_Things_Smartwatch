@@ -7,7 +7,7 @@ import time
 
 i2c = machine.I2C(-1, machine.Pin(5), machine.Pin(4))
 oled = ssd1306.SSD1306_I2C(128, 32, i2c)
-API_KEY = "AIzaSyAuVBCra8qfLX5TSHYI8hb_1n5rDY2V4oA" #Jason's key
+API_KEY = 
 API_ENDPOINT = "https://www.googleapis.com/geolocation/v1/geolocate?key="
 
 def do_connect():
