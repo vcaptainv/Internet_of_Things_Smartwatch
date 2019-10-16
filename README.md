@@ -40,17 +40,19 @@ Lab5:
      other spoken message on the OLED display should be included.
 Lab6:
 
-    Part One: Databases and Gesture Recognition
-
-        1. Establish a connection between the smartwatch and the AWS server and continuously send accelerometer data to the AWS database at a frequency of at least 1 Hz.
+    Part One: Databases and Gesture Recognition:
+    
+        1. Establish a connection between the smartwatch and the AWS server and continuously send accelerometer 
+           data to the AWS database at a frequency of at least 1 Hz.
         2. Setup a neural network on the AWS server that can recognize any letter in the word “COLUMBIA”.
         3. Obtain the word “COLUMBIA” within 10 tries and display the word one letter at a time on OLED.
-    Part Two: Creating the Smartwatch
-
+        
+    Part Two: Creating the Smartwatch: 
+    
         1. Features outlined for each of the subsystems should be functioning discretely.
                 a. Voice Commands
                 b. Smartphone Application
                 c. Embedded Server/ESP8266 d. Cloud Server/Database
-    2. All discrete components are combined and fully functioning.
+        2. All discrete components are combined and fully functioning.
 
 
