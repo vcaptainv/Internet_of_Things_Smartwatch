@@ -1,9 +1,9 @@
 # Internet-of-Things-Smart-Watch
-EECS-E4764 INTELLIGENT & CONNECTED SYSTEMS
+ INTELLIGENT & CONNECTED SYSTEMS
 
 Group 1 
 
-Author: Jason Tianyi Dai (td2593), Brian Wu, Yusheng Hu
+Author: Jason Tianyi Dai (td2593), Brian Wu(zw2542), Yusheng Hu(yh3097)
 
 Built a smart watch on Microcontroller ESP8266 using Python (Micropython)
 
