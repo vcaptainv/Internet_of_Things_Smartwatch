@@ -2,13 +2,19 @@ import network
 import socket
 import ssd1306
 import machine
+from machine import Pin
+import json
+import time
+import urequests
 
 i2c = machine.I2C(-1, machine.Pin(5), machine.Pin(4))
 oled = ssd1306.SSD1306_I2C(128, 32, i2c)
-rtc = machine.RTC()
-rtc.datetime((2019, 10, 13, 5, 0, 0, 0, 0))
-screen_on = True
-time_on = False
+spi = machine.SPI(1, baudrate=2000000, polarity=1, phase=1)
+cs = machine.Pin(15, machine.Pin.OUT)
+
+button_press = 0
+json_list = []
+Amazon_server= "http://18.218.34.7/post"
 
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
@@ -27,66 +33,71 @@ def display_text(str):
     oled.text(str, 0, 0)
     oled.show()
 
-# Update Command onto Screen
-def display_screen(str):
-    global screen_on, time_on
-    if screen_on == True:
-        if time_on == True:
-            display_time()
+def press_button(p):
+    global button_press
+    # debounce
+    active = 0
+    while active < 20:
+        if p.value() == 0:
+            active += 1
         else:
-            display_text(str)
+            return
+        time.sleep_ms(1)
+
+    if button_press == 0:
+        button_press = 1
+        display_text("Start")
     else:
-        oled.fill(0)
-        oled.show()
+        button_press = 0
+        display_text("Stop")
 
-# Query Current Time
-def display_time():
-    datetime = rtc.datetime()
-    oled.fill(0)
-    date_str = str(rtc.datetime()[0])+"/"+str(rtc.datetime()[1])+"/"+str(rtc.datetime()[2])
-    time_str = str(rtc.datetime()[4])+":"+str(rtc.datetime()[5])+":"+str(rtc.datetime()[6])
-    oled.text(date_str, 0, 0)
-    oled.text(time_str, 0, 10)
-    oled.show()
+def data_collection():
+    global button_press, json_list
+    #Read a number of bytes specified by nbytes while continuously writing
+    #the single byte given by write. Returns a bytes object with the data that was read.
+    cs.value(0)
+    x = spi.read(5, 0xf3) # register 33: X-Axis Data 1 # read 5 bytes
+    cs.value(1)
 
+    cs.value(0)
+    y = spi.read(5, 0xf5) # register 35: Y-Axis Data 1 # read 5 bytes
+    cs.value(1)
+    display_text(str(x[1])+","+str(y[1]))
+    json_data = {"x":x[1],"y":y[1]}
+    json_list.append(json_data)
+    time.sleep(0.1)
+
+def start_accel():
+    power_ctl = b'\x2d\x2b'
+    cs.value(0)
+    spi.write(power_ctl)
+    cs.value(1)
+    #0x31 --> data format control
+    data_format = b'\x31\x34'
+    cs.value(0)
+    spi.write(data_format)
+    cs.value(1)
 
 def main():
-    global screen_on, time_on
+    start_accel()
+    button_B = Pin(2, Pin.IN, Pin.PULL_UP)
+    button_B.irq(trigger=Pin.IRQ_FALLING, handler=press_button)
+
     ip_addr = do_connect()
-    addr = socket.getaddrinfo(ip_addr[0], 80)[0][-1]
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    s.bind(addr)
-    s.listen(1)
-
     while True:
-        client_socket, client_addr = s.accept()
-
-        request = client_socket.recv(2048)
-        request = str(request)
-
-        if 'msg' in request:
-            # Decode and Parse the response HTTP string
-            msg = request.split('/?msg=')[1].split('HTTP')[0]
-            msg = msg.replace('%20', ' ')
-
-            if 'screen on' in msg:
-                screen_on = True
-            if 'screen off' in msg:
-                screen_on = False
-
-            if 'time on' in msg:
-                time_on = True
-            if 'time off' in msg:
-                time_on = False
-
-            display_screen(msg)
-
-        # Send Response back to Android App
-        response = "HTTP/1.1 200 OK\n\n" + msg
-        client_socket.send(response.encode('utf-8'))
-        client_socket.close()
+        if button_press:
+            for i in range(20):
+                data_collection()
+            break
+    display_text("Finish collecting...")
+    count = 0
+    for i in range (len(json_list)):
+        display_text(str(count))
+        json_data = json.dumps(json_list[i])
+        reply = urequests.post(url = Amazon_server, data = json_data)
+        count += 1
+        time.sleep(0.1)
+    display_text("Finish sending...")
 
 if __name__ == '__main__':
     main()
-
