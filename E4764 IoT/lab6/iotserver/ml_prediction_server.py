@@ -10,8 +10,13 @@ sock.listen(5)
 while True:
     cl, addr = sock.accept()
     buf = cl.recv(4096)
-    print(buf)
+    
     buf = ast.literal_eval(bytes.decode(buf))
+    buf = buf.split(',')
+    buf = buf[:-1]
+    buf = [int(i) for i in buf]
+    print(buf)
+    
 
     clf = joblib.load("./random_forest_model.m")
     ans = clf.predict([buf])[0]
