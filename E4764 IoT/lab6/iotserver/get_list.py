@@ -1,9 +1,10 @@
 import requests, json
 from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
 from sklearn.externals import joblib
 import numpy
 def get_list():
-  url = 'http://18.218.34.7:8080/get'
+  url = 'http://127.0.0.1:8080/get'
   r = requests.get(url)
   co = json.loads(r.text)['result']
 
@@ -39,7 +40,8 @@ def get_list():
   return big,label
 
 def train_model(train, label):
-    clf = RandomForestClassifier(n_estimators = 100)
+    clf =RandomForestClassifier(n_estimators = 100)
+    #clf = svm.SVC(gamma='scale', decision_function_shape='ovo')
     clf.fit(train,label)
     joblib.dump(clf,"random_forest_model.m")
 
